@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -17,6 +17,33 @@ export default function App() {
   const [tasks, setTasks] = useState([]); //Estado para armazenar a lista de tarefas
   const [newTask, setNewTask] = useState(""); //Estado para o texto da nova tarefa
 
+
+  useEffect(()=>{
+    const loadTasks = async () => {
+      try{
+       const savedTasks = await AsyncStorage.getItem("tasks");
+       savedTasks && setTasks(JSON.parse(savedTasks))
+      } catch(error){
+        console.error("Erro ao carregar tarefas:", error);
+      }
+    };
+
+    loadTasks();
+  },[])
+ 
+ 
+  useEffect(()=>{
+    const saveTasks = async () => {
+      try{
+        await AsyncStorage.setItem("tasks", JSON.stringify(tasks))
+      } catch(error){
+        console.error("Erro ao salvar tarefas:", error);
+      }
+    };
+
+    saveTasks();
+  },[tasks])
+
   const addTask = () => {
     if (newTask.trim().length > 0) {
       //Garante que a tarefa não seja vazia
@@ -31,6 +58,48 @@ export default function App() {
       Alert.alert("Atenção", "Por favor, digite uma tarefa.");
     }
   };
+
+  const toggleTaskCompleted = (id) => {
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    Alert.alert(
+      "Confirmar exclusão",
+      "Tem certeza que deseja excluir esta tarefa?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () =>
+            setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id)),
+        },
+      ]
+    );
+  };
+
+  const renderList = ({ item }) => (
+    <View style={styles.taskItem} key={item.id}>
+      <TouchableOpacity
+        onPress={() => toggleTaskCompleted(item.id)}
+        style={styles.taskTextContainer}
+      >
+        <Text
+          style={[styles.taskText, item.completed && styles.completedTaskItem]}
+        >
+          {item.text}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => deleteTask(item.id)}>
+        <Text style={styles.taskText}>🗑️</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -58,14 +127,9 @@ export default function App() {
       <FlatList
         style={styles.flatList}
         data={tasks}
-        keyExtractor={(item) => item.id} //é uma chave de extração primária, que vai pegar 1 por 1, ele substitui o Map, 
+        keyExtractor={(item) => item.id} //é uma chave de extração primária, que vai pegar 1 por 1, ele substitui o Map,
         // pq no expo se já tiver chamado um FlatList, não funciona o Mao
-        renderItem={({ item }) => (
-          <View key={item.id} style={styles.taskItem}>
-            <Text>{item.text}</Text>
-            <TouchableOpacity><Text>🗑️</Text></TouchableOpacity>
-          </View>
-  )}
+        renderItem={renderList}
         ListEmptyComponent={() => (
           <Text style={styles.emptyListText}>
             Nenhuma tarefa adicionada ainda.
@@ -136,7 +200,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10, //Espaçamento no final da Lista
   },
   taskItem: {
-    backgroundColor: "FFF",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
