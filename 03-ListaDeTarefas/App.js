@@ -6,11 +6,32 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
+  Keyboard,
+  Alert,
   View,
 } from "react-native";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function App() {
-  // {toggleIcon, setToggleIcon}useState(false);
+  const [tasks, setTasks] = useState([]); //Estado para armazenar a lista de tarefas
+  const [newTask, setNewTask] = useState(""); //Estado para o texto da nova tarefa
+
+  const addTask = () => {
+    if (newTask.trim().length > 0) {
+      //Garante que a tarefa não seja vazia
+      setTasks((prevTasks) => [
+        ...prevTasks,
+        //Cria uma nova tarefa com id único
+        { id: Date.now().toString(), text: newTask.trim(), completed: false },
+      ]);
+      setNewTask(""); //Limpar o campo de input
+      Keyboard.dismiss();
+    } else {
+      Alert.alert("Atenção", "Por favor, digite uma tarefa.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Cabeçalho */}
@@ -25,14 +46,26 @@ export default function App() {
         <TextInput
           style={styles.input}
           placeholder="Adicionar nova tarefa..."
+          value={newTask}
+          onChangeText={setNewTask}
+          onSubmitEditing={addTask} //Adiciona a tarefa ao pressionar Enter no teclado
         />
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={addTask}>
           <Text style={styles.buttonText}>Adicionar</Text>
         </TouchableOpacity>
       </View>
       {/* Lista de tarefas do User */}
       <FlatList
         style={styles.flatList}
+        data={tasks}
+        keyExtractor={(item) => item.id} //é uma chave de extração primária, que vai pegar 1 por 1, ele substitui o Map, 
+        // pq no expo se já tiver chamado um FlatList, não funciona o Mao
+        renderItem={({ item }) => (
+          <View key={item.id} style={styles.taskItem}>
+            <Text>{item.text}</Text>
+            <TouchableOpacity><Text>🗑️</Text></TouchableOpacity>
+          </View>
+  )}
         ListEmptyComponent={() => (
           <Text style={styles.emptyListText}>
             Nenhuma tarefa adicionada ainda.
@@ -51,7 +84,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
-    backgroundColor:"#FFF",
+    backgroundColor: "#FFF",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -67,8 +100,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
-    backgroundColor:"#FFF",
-    color:"#000",
+    backgroundColor: "#FFF",
+    color: "#000",
     shadowColor: "#000",
     margin: 20,
     borderRadius: 15,
@@ -79,9 +112,9 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   input: {
-    backgroundColor:"#FCFCFC",
-    color:"#333",
-    borderColor:"#b0bec5",
+    backgroundColor: "#FCFCFC",
+    color: "#333",
+    borderColor: "#b0bec5",
     borderWidth: 1,
     borderRadius: 15,
     padding: 20,
@@ -89,7 +122,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   addButton: {
-    backgroundColor:"#009688",
+    backgroundColor: "#009688",
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
@@ -103,7 +136,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10, //Espaçamento no final da Lista
   },
   taskItem: {
-    backgroundColor:"FFF",
+    backgroundColor: "FFF",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -125,7 +158,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   taskText: {
-    color:"#333",
+    color: "#333",
     fontSize: 18,
     flexWrap: "wrap", //Permite que o texto quebre ao chegar no final da tela
   },
@@ -143,7 +176,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   emptyListText: {
-    color:"#9e9e9e",
+    color: "#9e9e9e",
     textAlign: "center",
     marginTop: 50,
     fontSize: 16,
