@@ -8,40 +8,27 @@ export default function App() {
   const [scoreText, setScoreText] = useState('');
   const [fadeAnim] = useState(new Animated.Value(0));
   const animationRef = useRef(null);
-  const handleContadorAumentar = ()=>{
-setContador(contador+1);
-showScore('+1');
-  }
- const handleContadorDiminuir = ()=>{
-contador > 0 && setContador(contador-1)
-showScore('-1');
-  }
- const handleContadorZerar = ()=>{
-  const numeroAnterior = contador;
-setContador(0);
-showScore(`-${numeroAnterior}`);
-      }
-
-    const showScore = (text) => {
-      if (animationRef.current) {
-        animationRef.current.stop();
-      }
+  
+  const showScore = (text) => {
+    if (animationRef.current) {
+      animationRef.current.stop();
+    }
         setScoreText(text);
         setScoreVisible(true);
 
         fadeAnim.setValue(0);
-      animationRef.current = Animated.sequence([
+        animationRef.current = Animated.sequence([
           Animated.timing(fadeAnim,{
             toValue: 1,
             duration:300,
             useNativeDriver:true,
           }),
-         Animated.delay(1700),
-         Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver:true,
-         }) 
+          Animated.delay(1700),
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver:true,
+          }) 
         ]);
         animationRef.current.start((finished)=>{
           if (finished){
@@ -50,7 +37,20 @@ showScore(`-${numeroAnterior}`);
           }
         })
       }
-
+      const handleContadorAumentar = ()=>{
+    setContador(contador+1);
+    showScore('+1');
+      }
+     const handleContadorDiminuir = ()=>{
+    contador > 0 && setContador(contador-1)
+    showScore('-1');
+      }
+     const handleContadorZerar = ()=>{
+      const numeroAnterior = contador;
+    setContador(0);
+    showScore(`-${numeroAnterior}`);
+          }
+      
   return (
     <View style={styles.container}>
       <View style={styles.screen}>

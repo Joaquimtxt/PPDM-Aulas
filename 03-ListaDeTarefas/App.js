@@ -13,10 +13,55 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const themes = {
+  light: {
+    backgroundColor: '#e0f7fa',
+    topBarBackground: '#fff',
+    cardBackground: '#fff',
+    textColor: '#000',
+    placeholderColor: '#666',
+    inputBackground: '#f5f5f5',
+    inputBorder: '#ddd',
+    buttonBackground: '#007bff',
+    buttonText: '#fff',
+    taskBackground: '#fff',
+    taskBorder: '#eee',
+    completedTaskBackground: '#f0f0f0',
+    completedTextColor: '#888',
+    emptyListColor: '#666',
+    shadowColor: '#000',
+    iconColor: '🌛',
+  },
+  dark: {
+    backgroundColor: '#121212',
+    topBarBackground: '#1e1e1e',
+    cardBackground: '#2e2e2e',
+    textColor: '#fff',
+    placeholderColor: '#aaa',
+    inputBackground: '#3e3e3e',
+    inputBorder: '#555',
+    buttonBackground: '#0d6efd',
+    buttonText: '#fff',
+    taskBackground: '#3e3e3e',
+    taskBorder: '#555',
+    completedTaskBackground: '#4e4e4e',
+    completedTextColor: '#aaa',
+    emptyListColor: '#aaa',
+    shadowColor: '#fff',
+    iconColor: '🌞',
+  }
+};
+
 export default function App() {
   const [tasks, setTasks] = useState([]); //Estado para armazenar a lista de tarefas
   const [newTask, setNewTask] = useState(""); //Estado para o texto da nova tarefa
+  const [light, setLight] = useState(true);
+  
+  const currentTheme = themes[light ? 'light' : 'dark'];
 
+  const toggleTheme = () => {
+    setLight(!light);
+  };
 
   useEffect(()=>{
     const loadTasks = async () => {
@@ -84,43 +129,60 @@ export default function App() {
   };
 
   const renderList = ({ item }) => (
-    <View style={styles.taskItem} key={item.id}>
-      <TouchableOpacity
+    <View style={[styles.taskItem, { 
+      backgroundColor: item.completed ? currentTheme.completedTaskBackground : currentTheme.taskBackground,
+      borderColor: currentTheme.taskBorder 
+    }]}>
+      <TouchableOpacity 
+        style={styles.taskContent}
         onPress={() => toggleTaskCompleted(item.id)}
-        style={styles.taskTextContainer}
       >
-        <Text
-          style={[styles.taskText, item.completed && styles.completedTaskItem]}
-        >
+        <Text style={[
+          styles.taskText, 
+          { color: item.completed ? currentTheme.completedTextColor : currentTheme.textColor },
+          item.completed && styles.completedTaskText
+        ]}>
           {item.text}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => deleteTask(item.id)}>
-        <Text style={styles.taskText}>🗑️</Text>
+        <Text style={styles.deleteIcon}>🗑️</Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: currentTheme.backgroundColor }]}>
       {/* Cabeçalho */}
-      <View style={styles.topBar}>
-        <Text style={styles.topBarTitle}>Minhas Tarefas</Text>
-        <TouchableOpacity>
-          <Text>🌛</Text>
+      <View style={[styles.topBar, { backgroundColor: currentTheme.topBarBackground }]}>
+        <Text style={[styles.topBarTitle, { color: currentTheme.textColor }]}>
+          Minhas Tarefas
+        </Text>
+        <TouchableOpacity onPress={toggleTheme}>
+          <Text style={styles.themeIcon}>{currentTheme.iconColor}</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: currentTheme.cardBackground }]}>
         {/* Local onde o user insere novas tarefas */}
         <TextInput
-          style={styles.input}
+          style={[styles.input, { 
+            backgroundColor: currentTheme.inputBackground,
+            borderColor: currentTheme.inputBorder,
+            color: currentTheme.textColor
+          }]}
           placeholder="Adicionar nova tarefa..."
+          placeholderTextColor={currentTheme.placeholderColor}
           value={newTask}
           onChangeText={setNewTask}
           onSubmitEditing={addTask} //Adiciona a tarefa ao pressionar Enter no teclado
         />
-        <TouchableOpacity style={styles.addButton} onPress={addTask}>
-          <Text style={styles.buttonText}>Adicionar</Text>
+        <TouchableOpacity 
+          style={[styles.addButton, { backgroundColor: currentTheme.buttonBackground }]} 
+          onPress={addTask}
+        >
+          <Text style={[styles.buttonText, { color: currentTheme.buttonText }]}>
+            Adicionar
+          </Text>
         </TouchableOpacity>
       </View>
       {/* Lista de tarefas do User */}
@@ -131,69 +193,64 @@ export default function App() {
         // pq no expo se já tiver chamado um FlatList, não funciona o Mao
         renderItem={renderList}
         ListEmptyComponent={() => (
-          <Text style={styles.emptyListText}>
+          <Text style={[styles.emptyListText, { color: currentTheme.emptyListColor }]}>
             Nenhuma tarefa adicionada ainda.
           </Text>
         )}
         contentContainerStyle={styles.flatListContent}
       />
-      <StatusBar style="auto" />
+      <StatusBar style={light ? "dark" : "light"} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#e0f7fa",
     flex: 1,
   },
   topBar: {
-    backgroundColor: "#FFF",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 50, //Ajuste para a barra de status
     paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   topBarTitle: {
-    color: "#00796b",
     fontSize: 24,
     fontWeight: "bold",
   },
+  themeIcon: {
+    fontSize: 24,
+  },
   card: {
-    backgroundColor: "#FFF",
-    color: "#000",
-    shadowColor: "#000",
     margin: 20,
-    borderRadius: 15,
     padding: 20,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 10,
+    borderRadius: 10,
+    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   input: {
-    backgroundColor: "#FCFCFC",
-    color: "#333",
-    borderColor: "#b0bec5",
     borderWidth: 1,
-    borderRadius: 15,
-    padding: 20,
-    fontSize: 18,
-    marginBottom: 10,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 15,
   },
   addButton: {
-    backgroundColor: "#009688",
+    borderRadius: 8,
     paddingVertical: 12,
-    borderRadius: 10,
     alignItems: "center",
   },
   buttonText: {
-    color: "#FFF",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
   flatListContent: {
@@ -211,37 +268,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 5,
-    backgroundColor: "#FFF",
-    color: "#333",
     borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.1",
   },
-  taskTextContainer: {
+  taskContent: {
     flex: 1, //Permite que o texto ocupe o espaço disponível
     marginRight: 10,
   },
   taskText: {
-    color: "#333",
     fontSize: 18,
     flexWrap: "wrap", //Permite que o texto quebre ao chegar no final da tela
   },
-  completedTaskItem: {
+  completedTaskText: {
     textDecorationLine: "line-through", //risca o texto
-    opacity: 0.6,
   },
-  deleteButton: {
-    padding: 8,
-    borderRadius: 5,
-  },
-  deleteButtonText: {
-    // color:"#fff",
-    fontSize: 22,
-    fontWeight: "bold",
+  deleteIcon: {
+    fontSize: 18,
+    marginLeft: 10,
   },
   emptyListText: {
-    color: "#9e9e9e",
     textAlign: "center",
     marginTop: 50,
     fontSize: 16,
+    fontStyle: "italic",
   },
 });
