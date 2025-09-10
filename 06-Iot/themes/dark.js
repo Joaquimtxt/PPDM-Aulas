@@ -1,0 +1,15 @@
+export const darkTheme = {
+    background: "#29335e",
+    card: "#4758a1",
+    text: "#fff",
+    label: "#aaaaaa",
+    border: "#6279de",
+    iconBg: "#7fecfa",
+    buttonPrimary: "#3399ff",
+    buttonDanger: "#ff4d4d",
+    result: "#66ccff",
+    infoBg: "#1e1e1e",
+    infoBorder: "#333",
+    progressBarBg: "#333", 
+    progressBarFill: "#3399ff",
+};

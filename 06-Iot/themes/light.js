@@ -1,0 +1,15 @@
+export const lightTheme = {
+    background: "#98f7fa",
+    card: "#3a6f70",
+    text: "#212121",
+    label: "#555",
+    border: "#ccc",
+    iconBg: "#136d80",
+    buttonPrimary: "#007bff",
+    buttonDanger: "#dc3545",
+    result: "#007bff",
+    infoBg: "#fff",
+    infoBorder: "#eee",
+    progressBarBg: "#eee", 
+    progressBarFill: "#007bff", 
+};
