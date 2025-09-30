@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "07-Abas",
+    "slug": "07-Abas",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "auto",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+          "userInterfaceStyle": "auto"
+      
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
