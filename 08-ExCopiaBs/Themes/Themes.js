@@ -1,6 +1,6 @@
 export const dark = {
-    background: "#000"
+    background: "#302873"
 }
 export const light ={
-    background:"#fff"
+    background:"#bdf2fc"
 }

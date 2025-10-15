@@ -5,6 +5,7 @@ import HomeScreen from './Screens/HomeScreen';
 import { enableScreens } from 'react-native-screens';
 import { dark, light } from './Themes/Themes';
 import { SensorDHTScreen } from './Screens/SensorDHTScreen';
+import { Ionicons } from '@expo/vector-icons';
 
 enableScreens();
 const Tab = createBottomTabNavigator();
@@ -14,9 +15,19 @@ export default function App() {
   return (
 <Buildstrap customThemes={{dark, light}}>
   <NavigationContainer>
-<Tab.Navigator screenOptions={{headerShown:false}}>
-  <Tab.Screen name='Home' component={HomeScreen}/>
-  <Tab.Screen name='sensor' component={SensorDHTScreen}/>
+<Tab.Navigator screenOptions={{headerShown:false}} >
+  <Tab.Screen name='Home' component={HomeScreen}
+   options={{
+    tabBarIcon: () => (
+      <Ionicons name="home" size={24} color="dark" />
+    ),
+  }}/>
+  <Tab.Screen name='sensor' component={SensorDHTScreen}
+   options={{
+    tabBarIcon: () => (
+      <Ionicons name="thermometer" size={24} color="dark" />
+    ),
+  }}/>
 </Tab.Navigator>
   </NavigationContainer>
 </Buildstrap>
